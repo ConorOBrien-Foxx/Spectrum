@@ -11,7 +11,7 @@ A JavaScript library for image manipulation.
 
 ## Examples
 
-    const Image = require("spectrum").Image;
+    const Image = require("spectrumjs").Image;
     Image.fromFile("cat.png").invert().output("scary-cat.png");
 
 This inverts each RGB value, then writes the result to `scary-cat.png`.
