@@ -1,0 +1,30 @@
+{
+  "name": "spectrum",
+  "version": "1.0.0",
+  "description": "Esoteric, color-based language",
+  "main": "spectrum.js",
+  "scripts": {
+    "test": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ConorOBrien-Foxx/Spectrum.git"
+  },
+  "keywords": [
+    "esoteric",
+    "language",
+    "color",
+    "image"
+  ],
+  "author": "Conor O'Brien",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ConorOBrien-Foxx/Spectrum/issues"
+  },
+  "homepage": "https://github.com/ConorOBrien-Foxx/Spectrum#readme",
+  "dependencies": {
+    "minimist": "^1.2.0",
+    "opn": "^4.0.2",
+    "pngjs": "^3.0.1"
+  }
+}
