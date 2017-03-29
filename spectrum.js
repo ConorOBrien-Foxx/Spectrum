@@ -571,6 +571,7 @@ Spectrum.ops = new Map([
             callback();
         });
     }],
+    ["n", Spectrum.lambda(n => +n)],
     ["v", Spectrum.lambda(Image.stitchVertical)],
     ["h", Spectrum.lambda(Image.stitchHorizontal)],
     ["f", Spectrum.lambda(Image.flipHorizontal)],
