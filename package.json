@@ -1,5 +1,5 @@
 {
-  "name": "spectrum",
+  "name": "spectrumjs",
   "version": "1.0.0",
   "description": "Esoteric, color-based language",
   "main": "spectrum.js",
