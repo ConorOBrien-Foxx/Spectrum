@@ -1,6 +1,6 @@
 {
   "name": "spectrumjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Library for handling of images pixel-wise.",
   "main": "spectrum.js",
   "scripts": {
