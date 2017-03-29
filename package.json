@@ -1,7 +1,7 @@
 {
   "name": "spectrumjs",
   "version": "1.0.0",
-  "description": "Esoteric, color-based language",
+  "description": "Library for handling of images pixel-wise.",
   "main": "spectrum.js",
   "scripts": {
     "test": ""
@@ -14,7 +14,8 @@
     "esoteric",
     "language",
     "color",
-    "image"
+    "image",
+    "library"
   ],
   "author": "Conor O'Brien",
   "license": "ISC",
