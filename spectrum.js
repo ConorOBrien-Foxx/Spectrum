@@ -83,6 +83,44 @@ class Image {
         return this.png.height;
     }
     
+    get(x, y){
+        let res = [];
+        let idx = this.png.width * y + x << 2;
+        for(let i = 0; i < 4; i++)
+            res.push(this.png.data[((this.png.width * y + x) << 2) + i]);
+        return res;
+    }
+    
+    static clamp(value, min=0, max=255){
+        return value < min ? min : value > max ? max : value;
+    }
+    
+    static vectorbin(f, a, b){
+        if(!(a instanceof Image))
+            a = Image.fromFile(a);
+        if(!(b instanceof Image))
+            b = Image.fromFile(b);
+        return a.mapCoor((x, y, idx, col) => {
+            return b.get(x, y).map((e, i) => f(col[i], e));
+        });
+    }
+    
+    static add(a, b){
+        return Image.vectorbin((x, y) => x + y, a, b);
+    }
+    
+    add(b){
+        return Image.add(this, b);
+    }
+    
+    static equal(a, b){
+        return Image.vectorbin((x, y) => 255 * (x == y), a, b);
+    }
+    
+    equal(b){
+        return Image.equal(this, b);
+    }
+    
     static output(im, fileName){
         if(!(im instanceof Image))
             im = Image.fromFile(im);
@@ -104,17 +142,32 @@ class Image {
         return new Image(copypng);
     }
     
+    // f(x, y, idx, color)
+    mapCoor(f){
+        timelog("start", "map coor");
+        let copy = this.clone();
+        pngMap(copy.png, (p, idx, x, y) => {
+            let res = f(x, y, idx, [0, 1, 2, 3].map(e => p.data[idx + e]));
+            for(let i = 0; i < 4; i++){
+                if(typeof res[i] !== "undefined")
+                    copy.png.data[idx + i] = Image.clamp(res[i]);
+            }
+        });
+        timelog("end", "map coor");
+        return copy;
+    }
+    
     mapAlpha(f){
-        timelog("start", "map");
+        timelog("start", "map alpha");
         let copy = this.clone();
         pngMap(copy.png, (p, idx, x, y) => {
             let res = f(...[0, 1, 2, 3].map(e => p.data[idx + e]));
             for(let i = 0; i < 4; i++){
                 if(typeof res[i] !== "undefined")
-                    copy.png.data[idx + i] = res[i];
+                    copy.png.data[idx + i] = Image.clamp(res[i]);
             }
         });
-        timelog("end", "map");
+        timelog("end", "map alpha");
         return copy;
     }
     
@@ -197,8 +250,6 @@ class Image {
     static flipVertical(a){
         if(!(a instanceof Image))
             a = Image.fromFile(a);
-        if(!(b instanceof Image))
-            b = Image.fromFile(b);
         return Image.fromMatrix(a.toMatrix().reverse());
     }
     
@@ -209,8 +260,6 @@ class Image {
     static flipHorizontal(a){
         if(!(a instanceof Image))
             a = Image.fromFile(a);
-        if(!(b instanceof Image))
-            b = Image.fromFile(b);
         return Image.fromMatrix(a.toMatrix().map(e => e.reverse()));
     }
     
@@ -485,10 +534,13 @@ class Spectrum {
 
 //todo: variables and functions
 Spectrum.ops = new Map([
-    ["+", Spectrum.lambda((a, b) => a + b)],
-    ["-", Spectrum.lambda((a, b) => a - b)],
-    ["/", Spectrum.lambda((a, b) => a / b)],
-    ["*", Spectrum.lambda((a, b) => a * b)],
+    ["+", Spectrum.lambda((a, b) => a.add ? a.add(b) : a + b)],
+    ["-", Spectrum.lambda((a, b) => a.sub ? a.sub(b) : a - b)],
+    ["/", Spectrum.lambda((a, b) => a.div ? a.div(b) : a / b)],
+    ["*", Spectrum.lambda((a, b) => a.mul ? a.mul(b) : a * b)],
+    ["%", Spectrum.lambda((a, b) => a.mod ? a.mod(b) : a % b)],
+    ["=", Spectrum.lambda((a, b) => +(a == b))],
+    ["E", Spectrum.lambda(Image.equal)],
     ["p", Spectrum.lambda(console.log, 1)],
     ["r", Spectrum.lambda(Image.fromFile)],
     ["i", Spectrum.lambda(Image.invert)],
@@ -526,6 +578,7 @@ Spectrum.ops = new Map([
     ["I", Spectrum.lambda(Image.isolate)],
     ["w", Spectrum.lambda(Image.warhol, 1)],
     ["W", Spectrum.lambda(Image.warhol, 2)],
+    ["g", Spectrum.lambda((x, y) => x.get ? x.get(...y) : x[y])],
     ["l", function(callback){
         getLine((line) => {
             this.stack.push(line);
